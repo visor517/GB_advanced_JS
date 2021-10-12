@@ -5,8 +5,11 @@ const goods = [
     { title: 'Shoes', price: 250 },
 ]
 
-const renderGoodsItem = (index, title = 'нет названия', price = 'бесценно') => `<tr class="goods-item"><th scope="row">${index}</th><td>${title}</td><td>${price} руб.</td></tr>`
-  
+const renderGoodsItem = (index, title = 'нет названия', price = 'бесценно') => {
+    return `<tr class="goods-item"><th scope="row">${index}</th><td>${title}</td><td>${price} руб.</td></tr>`
+}
+// можно сократить скобки и return, но будет длинная строка
+
 const renderGoodsList = list => {
     let goodsList = list.map((item, index) => renderGoodsItem(++index, item.title, item.price))
     let tableHeader = '<tr><th scope="col">#</th><th scope="col">Название</th><th scope="col">Цена</th></tr>'
