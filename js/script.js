@@ -1,20 +1,23 @@
-function makeGETRequest(url, callback) {
-    var xhr
-  
-    if (window.XMLHttpRequest) {
-      xhr = new XMLHttpRequest()
-    } else if (window.ActiveXObject) { 
-      xhr = new ActiveXObject("Microsoft.XMLHTTP")
-    }
-  
-    xhr.onreadystatechange = function () {
-      if (xhr.readyState === 4) {
-        callback(xhr.responseText)
-      }
-    }
-  
-    xhr.open('GET', url, true)
-    xhr.send()
+function makeGETRequest(url) {
+    return new Promise((resolve, reject) => {
+        let xhr
+    
+        if (window.XMLHttpRequest) {
+            xhr = new XMLHttpRequest()
+        } else if (window.ActiveXObject) { 
+            xhr = new ActiveXObject("Microsoft.XMLHTTP")
+        }
+    
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                if (xhr.status == 200) resolve(xhr.responseText)
+                else reject(`Запрос не прошел. Ошибка:${xhr.status}`)
+            }
+        }
+    
+        xhr.open('GET', url, true)
+        xhr.send()
+    })
 }
 
 const API_URL = 'https://raw.githubusercontent.com/GeekBrainsTutorial/online-store-api/master/responses'
@@ -38,10 +41,14 @@ class GoodsList {
         this.goods = []
     }
     fetchGoods(cb) {
-        makeGETRequest(`${API_URL}/catalogData.json`, (goods) => {
-            this.goods = JSON.parse(goods)
-            cb()
-        })
+        makeGETRequest(`${API_URL}/catalogData.json`)
+        .then(
+            res => {
+                this.goods = JSON.parse(res)
+                cb()
+            },
+            error => console.log(error)
+        )
     }
     render() {
         const tableHeader = `<tr>
