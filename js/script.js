@@ -1,3 +1,24 @@
+function makeGETRequest(url, callback) {
+    var xhr
+  
+    if (window.XMLHttpRequest) {
+      xhr = new XMLHttpRequest()
+    } else if (window.ActiveXObject) { 
+      xhr = new ActiveXObject("Microsoft.XMLHTTP")
+    }
+  
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === 4) {
+        callback(xhr.responseText)
+      }
+    }
+  
+    xhr.open('GET', url, true)
+    xhr.send()
+}
+
+const API_URL = 'https://raw.githubusercontent.com/GeekBrainsTutorial/online-store-api/master/responses'
+
 class GoodsItem {
     constructor(title, price) {
         this.title = title
@@ -16,13 +37,11 @@ class GoodsList {
     constructor() {
         this.goods = []
     }
-    fetchGoods() {
-        this.goods = [
-            { title: 'Shirt', price: 150 },
-            { title: 'Socks', price: 50 },
-            { title: 'Jacket', price: 350 },
-            { title: 'Shoes', price: 250 },
-        ]
+    fetchGoods(cb) {
+        makeGETRequest(`${API_URL}/catalogData.json`, (goods) => {
+            this.goods = JSON.parse(goods)
+            cb()
+        })
     }
     render() {
         const tableHeader = `<tr>
@@ -31,7 +50,7 @@ class GoodsList {
             <th scope="col">Цена</th>
         </tr>`
         const tableContent = this.goods.map((good, index) => {
-            const goodItem = new GoodsItem(good.title, good.price)
+            const goodItem = new GoodsItem(good.product_name, good.price)
             return goodItem.render(++index)
         }).join('')
 
@@ -96,8 +115,9 @@ class Basket {
 const $goodsList = document.querySelector('.goods-list')
 
 const list = new GoodsList()
-list.fetchGoods()
-$goodsList.innerHTML = list.render()
+list.fetchGoods(() => {
+    $goodsList.innerHTML = list.render()
+})
 
 let myBasket = new Basket()
 myBasket.addItems(list.goods)    // пока весь товар добавляем в корзину
