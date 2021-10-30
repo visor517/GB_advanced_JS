@@ -39,6 +39,11 @@ class GoodsItem {
 class GoodsList {
     constructor() {
         this.goods = []
+        this.filteredGoods = []
+    }
+    filterGoods(value) {
+        const regexp = new RegExp(value, 'i')
+        this.filteredGoods = this.goods.filter(good => regexp.test(good.product_name))
     }
     fetchGoods() {
         return new Promise((resolve, reject) => {
@@ -46,6 +51,7 @@ class GoodsList {
             .then(
                 res => {
                     this.goods = JSON.parse(res)
+                    this.filteredGoods = JSON.parse(res)
                     resolve(true)
                 },
                 error => {
@@ -61,7 +67,7 @@ class GoodsList {
             <th scope="col">Название</th>
             <th scope="col">Цена</th>
         </tr>`
-        const tableContent = this.goods.map((good, index) => {
+        const tableContent = this.filteredGoods.map((good, index) => {
             const goodItem = new GoodsItem(good.product_name, good.price)
             return goodItem.render(++index)
         }).join('')
@@ -119,9 +125,6 @@ class Basket {
             makeGETRequest(`${API_URL}/addToBasket.json`)
             .then(
                 res => {
-                    // this.contents = JSON.parse(res)
-// Тут пока не ясно что делать. ну получаем мы {result: 1} ??? Нужен реальный api и тогда можно отправлять post с json
-// Вообще по заглушкам не понятно где будет хранится корзина (в брузере или на сервере) и где будут вычисления стоимости
                     console.log(JSON.parse(res))    
                     resolve(true)                   
                 },                                  
@@ -166,6 +169,16 @@ class Basket {
         return tableHeader + tableContent + tableSum
     }
 }
+
+
+const $searchButton = document.querySelector('#search-button')
+const $searchInput = document.querySelector('#search-input')
+
+$searchButton.addEventListener('click', e => {
+    const value = $searchInput.value
+    list.filterGoods(value)
+    $goodsList.innerHTML = list.render()
+})
 
 const $goodsList = document.querySelector('.goods-list')
 

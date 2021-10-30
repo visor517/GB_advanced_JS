@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>eShop</title>
+    <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/bootstrap.min.css">
 </head>
 <body>
@@ -9,8 +10,10 @@
         <nav class="navbar navbar-light">
             <div class="container-fluid">
                 <a class="nav-link active" aria-current="page" href="index.html"><h2 class="text-light">eShop</h2></a>
-                <div>
-                    <button id ="basket" class="btn btn-outline-light cart-button" type="button" onclick="renderBasket(myBasket)">Корзина</button>
+                <div class="nav-wrapper">
+                    <input id="search-input" type="text" class="goods-search" />
+                    <button id="search-button" class="btn btn-outline-light cart-button" type="button">Искать</button>
+                    <button id="basket" class="btn btn-outline-light cart-button" type="button" onclick="renderBasket(myBasket)">Корзина</button>
                 </div>
             </div>
         </nav>
