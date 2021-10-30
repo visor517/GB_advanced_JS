@@ -110,8 +110,8 @@ class Basket {
             makeGETRequest(`${API_URL}/getBasket.json`)
             .then(
                 res => {
-                    this.contents = JSON.parse(res).contents.map(item => new BasketItem(item))      // не совсем ясно как лучше хранить содержимое корзины
-                    resolve(true)                                                                   // как пришло или уже в формате BasketItem со всеми методами
+                    this.contents = JSON.parse(res).contents.map(item => new BasketItem(item))
+                    resolve(true)
                 },
                 error => {
                     console.log(error)
@@ -170,9 +170,16 @@ class Basket {
     }
 }
 
-
+const $goodsList = document.querySelector('#goods-list')
 const $searchButton = document.querySelector('#search-button')
 const $searchInput = document.querySelector('#search-input')
+const $basketButton = document.querySelector('#basket-button')
+
+const list = new GoodsList()
+list.fetchGoods().then(_ => $goodsList.innerHTML = list.render())
+
+const myBasket = new Basket()
+myBasket.getBasket()
 
 $searchButton.addEventListener('click', e => {
     const value = $searchInput.value
@@ -180,17 +187,6 @@ $searchButton.addEventListener('click', e => {
     $goodsList.innerHTML = list.render()
 })
 
-const $goodsList = document.querySelector('.goods-list')
-
-const list = new GoodsList()
-list.fetchGoods().then(_ => $goodsList.innerHTML = list.render())
-
-let myBasket = new Basket()
-myBasket.getBasket()
-
-// myBasket.addToBasket()
-// myBasket.deleteFromBasket()
-
-function renderBasket(basket) {     // открытие корзины по кнопке
-    $goodsList.innerHTML = basket.render()
-}
+$basketButton.addEventListener('click', e => {
+    $goodsList.innerHTML = myBasket.render()
+})
