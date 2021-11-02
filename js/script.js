@@ -39,6 +39,11 @@ class GoodsItem {
 class GoodsList {
     constructor() {
         this.goods = []
+        this.filteredGoods = []
+    }
+    filterGoods(value) {
+        const regexp = new RegExp(value, 'i')
+        this.filteredGoods = this.goods.filter(good => regexp.test(good.product_name))
     }
     fetchGoods() {
         return new Promise((resolve, reject) => {
@@ -46,6 +51,7 @@ class GoodsList {
             .then(
                 res => {
                     this.goods = JSON.parse(res)
+                    this.filteredGoods = JSON.parse(res)
                     resolve(true)
                 },
                 error => {
@@ -61,7 +67,7 @@ class GoodsList {
             <th scope="col">Название</th>
             <th scope="col">Цена</th>
         </tr>`
-        const tableContent = this.goods.map((good, index) => {
+        const tableContent = this.filteredGoods.map((good, index) => {
             const goodItem = new GoodsItem(good.product_name, good.price)
             return goodItem.render(++index)
         }).join('')
@@ -104,8 +110,8 @@ class Basket {
             makeGETRequest(`${API_URL}/getBasket.json`)
             .then(
                 res => {
-                    this.contents = JSON.parse(res).contents.map(item => new BasketItem(item))      // не совсем ясно как лучше хранить содержимое корзины
-                    resolve(true)                                                                   // как пришло или уже в формате BasketItem со всеми методами
+                    this.contents = JSON.parse(res).contents.map(item => new BasketItem(item))
+                    resolve(true)
                 },
                 error => {
                     console.log(error)
@@ -119,9 +125,6 @@ class Basket {
             makeGETRequest(`${API_URL}/addToBasket.json`)
             .then(
                 res => {
-                    // this.contents = JSON.parse(res)
-// Тут пока не ясно что делать. ну получаем мы {result: 1} ??? Нужен реальный api и тогда можно отправлять post с json
-// Вообще по заглушкам не понятно где будет хранится корзина (в брузере или на сервере) и где будут вычисления стоимости
                     console.log(JSON.parse(res))    
                     resolve(true)                   
                 },                                  
@@ -167,17 +170,48 @@ class Basket {
     }
 }
 
-const $goodsList = document.querySelector('.goods-list')
+const $goodsList = document.querySelector('#goods-list')
+const $searchButton = document.querySelector('#search-button')
+const $searchInput = document.querySelector('#search-input')
+const $basketButton = document.querySelector('#basket-button')
+const $formButton = document.querySelector('#form-button')
 
 const list = new GoodsList()
 list.fetchGoods().then(_ => $goodsList.innerHTML = list.render())
 
-let myBasket = new Basket()
+const myBasket = new Basket()
 myBasket.getBasket()
 
-// myBasket.addToBasket()
-// myBasket.deleteFromBasket()
+$searchButton.addEventListener('click', e => {
+    const value = $searchInput.value
+    list.filterGoods(value)
+    $goodsList.innerHTML = list.render()
+})
 
-function renderBasket(basket) {     // открытие корзины по кнопке
-    $goodsList.innerHTML = basket.render()
-}
+$basketButton.addEventListener('click', e => {
+    $goodsList.innerHTML = myBasket.render()
+})
+
+$formButton.addEventListener('click', e => {
+    $formName = document.querySelector('#formName')
+    $formPhone = document.querySelector('#formPhone')
+    $formEmail = document.querySelector('#formEmail')
+    $formComment = document.querySelector('#formComment')
+
+    if (/[^a-zа-яё]/i.test($formName.value)) {
+        $formName.classList.add("border-danger")
+    }
+    else $formName.classList.remove("border-danger")
+
+    if (!/^\+7\(\d{3}\)\d{3}-\d{4}$/.test($formPhone.value)) {
+        $formPhone.classList.add("border-danger")
+    }
+    else $formPhone.classList.remove("border-danger")
+
+    if (!/^([a-z0-9_\.-]+)@([a-z0-9_\.-]+)\.([a-z\.]{2,6})$/.test($formEmail.value)) {
+        $formEmail.classList.add("border-danger")
+    }
+    else $formEmail.classList.remove("border-danger")
+
+    e.preventDefault()
+})
