@@ -1,12 +1,36 @@
+function makeGETRequest(url) {
+    return new Promise((resolve, reject) => {
+        let xhr
+    
+        if (window.XMLHttpRequest) {
+            xhr = new XMLHttpRequest()
+        } else if (window.ActiveXObject) { 
+            xhr = new ActiveXObject("Microsoft.XMLHTTP")
+        }
+    
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                if (xhr.status == 200) resolve(xhr.responseText)
+                else reject(`Запрос не прошел ${url}. Ошибка:${xhr.status}`)
+            }
+        }
+    
+        xhr.open('GET', url, true)
+        xhr.send()
+    })
+}
+
+const API_URL = 'https://raw.githubusercontent.com/GeekBrainsTutorial/online-store-api/master/responses'
+
 class GoodsItem {
-    constructor(title, price) {
-        this.title = title
+    constructor(product_name, price) {
+        this.product_name = product_name
         this.price = price
     }
     render(index='-') {
         return `<tr class="goods-item">
                     <th scope="row">${index}</th>
-                    <td>${this.title}</td>
+                    <td>${this.product_name}</td>
                     <td>${this.price}</td>
                 </tr>`
     }
@@ -17,12 +41,19 @@ class GoodsList {
         this.goods = []
     }
     fetchGoods() {
-        this.goods = [
-            { title: 'Shirt', price: 150 },
-            { title: 'Socks', price: 50 },
-            { title: 'Jacket', price: 350 },
-            { title: 'Shoes', price: 250 },
-        ]
+        return new Promise((resolve, reject) => {
+            makeGETRequest(`${API_URL}/catalogData.json`)
+            .then(
+                res => {
+                    this.goods = JSON.parse(res)
+                    resolve(true)
+                },
+                error => {
+                    console.log(error)
+                    reject('error')
+                }
+            )
+        })
     }
     render() {
         const tableHeader = `<tr>
@@ -31,7 +62,7 @@ class GoodsList {
             <th scope="col">Цена</th>
         </tr>`
         const tableContent = this.goods.map((good, index) => {
-            const goodItem = new GoodsItem(good.title, good.price)
+            const goodItem = new GoodsItem(good.product_name, good.price)
             return goodItem.render(++index)
         }).join('')
 
@@ -40,9 +71,9 @@ class GoodsList {
 }
 
 class BasketItem extends GoodsItem {
-    constructor({title, price}) {
-        super(title, price)
-        this.quantity = 1
+    constructor({product_name, price, quantity}) {
+        super(product_name, price)
+        this.quantity = quantity
     }
     upQuantity() {
         this.quantity++
@@ -56,7 +87,7 @@ class BasketItem extends GoodsItem {
     render(index='-') { 
         return `<tr class="goods-item">
                     <th scope="row">${index}</th>
-                    <td>${this.title || 'нет названия'}</td>
+                    <td>${this.product_name || 'нет названия'}</td>
                     <td>${this.quantity || 0}</td>
                     <td>${this.price || '-'} руб.</td>
                     <td>${this.getTotalPrice() || '-'} руб.</td>
@@ -66,19 +97,62 @@ class BasketItem extends GoodsItem {
 
 class Basket {
     constructor() {
-        this.content = []
+        this.contents = []
     }
-    addItems(items) {
-        if (!Array.isArray(items)) items = [items]
-        for (let item of items) {
-            this.content.push(new BasketItem(item))
-        } 
+    getBasket() {
+        return new Promise((resolve, reject) => {
+            makeGETRequest(`${API_URL}/getBasket.json`)
+            .then(
+                res => {
+                    this.contents = JSON.parse(res).contents.map(item => new BasketItem(item))      // не совсем ясно как лучше хранить содержимое корзины
+                    resolve(true)                                                                   // как пришло или уже в формате BasketItem со всеми методами
+                },
+                error => {
+                    console.log(error)
+                    reject('error')
+                }
+            )
+        })
+    }
+    addToBasket(item) {
+        return new Promise((resolve, reject) => {
+            makeGETRequest(`${API_URL}/addToBasket.json`)
+            .then(
+                res => {
+                    // this.contents = JSON.parse(res)
+// Тут пока не ясно что делать. ну получаем мы {result: 1} ??? Нужен реальный api и тогда можно отправлять post с json
+// Вообще по заглушкам не понятно где будет хранится корзина (в брузере или на сервере) и где будут вычисления стоимости
+                    console.log(JSON.parse(res))    
+                    resolve(true)                   
+                },                                  
+                error => {                          
+                    console.log(error)
+                    reject('error')
+                }
+            )
+        }) 
+    }
+    deleteFromBasket(itemId) {
+        return new Promise((resolve, reject) => {
+            makeGETRequest(`${API_URL}/deleteFromBasket.json`)
+            .then(
+                res => {
+                    // this.contents = JSON.parse(res)
+                    console.log(JSON.parse(res))
+                    resolve(true)
+                },
+                error => {
+                    console.log(error)
+                    reject('error')
+                }
+            )
+        }) 
     }
     getTotalPrice() {
-        return this.content.reduce((acum, item) => acum + item.getTotalPrice(), 0)
+        return this.contents.reduce((acum, item) => acum + item.getTotalPrice(), 0)
     }
     render() {
-        let itemsList = this.content.map((item, index) => item.render(++index))
+        let itemsList = this.contents.map((item, index) => item.render(++index))
         const tableHeader = `<tr>
             <th scope="col">#</th>
             <th scope="col">Название</th>
@@ -96,16 +170,14 @@ class Basket {
 const $goodsList = document.querySelector('.goods-list')
 
 const list = new GoodsList()
-list.fetchGoods()
-$goodsList.innerHTML = list.render()
+list.fetchGoods().then(_ => $goodsList.innerHTML = list.render())
 
 let myBasket = new Basket()
-myBasket.addItems(list.goods)    // пока весь товар добавляем в корзину
-myBasket.content[1].upQuantity()    // поднимем кол-во для второго това (проверка)
-myBasket.content[2].downQuantity()
+myBasket.getBasket()
+
+// myBasket.addToBasket()
+// myBasket.deleteFromBasket()
 
 function renderBasket(basket) {     // открытие корзины по кнопке
     $goodsList.innerHTML = basket.render()
 }
-
-// Метод, определяющий суммарную стоимость всех товаров сделал для корзины. Корзина по кнопке.
