@@ -47,3 +47,34 @@ const app = new Vue({
         )
     }
 })
+
+Vue.component('goods-list', {
+    props: ['goods'],
+    template: `
+        <table id="goods-list" class="table table-success table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Название</th>
+                    <th scope="col">Цена</th>
+                </tr>
+            </thead>
+            <tbody>
+                <goods-item class="goods-item" v-for="(good, index) in goods" :good="good" :index="index"></goods-item>
+                <tr v-if="goods.length == 0"><td colspan="3">Список пуст</td></tr>
+            </tbody>
+        </table>
+    `
+})
+
+Vue.component('goods-item', {
+    props: ['good', 'index'],
+    template: `
+        <tr>
+            <th scope="row">{{index+1}}</th>
+            <td>{{ good.product_name }}</td>
+            <td>{{ good.price }} руб.</td>
+        </tr>
+    `
+})
+    

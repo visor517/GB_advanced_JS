@@ -8,3 +8,4 @@
 3. Асинхронность. AJAX, XMLHttpRequest, Promise
 4. Регулярные выражения
 5. VUE
+6. Компоненты VUE 
