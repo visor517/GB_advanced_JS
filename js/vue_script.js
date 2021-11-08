@@ -1,52 +1,5 @@
 const API_URL = 'https://raw.githubusercontent.com/GeekBrainsTutorial/online-store-api/master/responses'
 
-const app = new Vue({
-    el: '#app',
-    data: {
-        goods: [],
-        filteredGoods: [],
-        isVisibleCart: false
-    },
-    methods: {
-        makeGETRequest(url) {
-            console.log('Запрос')
-            return new Promise((resolve, reject) => {
-                let xhr
-            
-                if (window.XMLHttpRequest) {
-                    xhr = new XMLHttpRequest()
-                } else if (window.ActiveXObject) { 
-                    xhr = new ActiveXObject("Microsoft.XMLHTTP")
-                }
-            
-                xhr.onreadystatechange = function () {
-                    if (xhr.readyState === 4) {
-                        if (xhr.status == 200) resolve(xhr.responseText)
-                        else reject(`Запрос не прошел ${url}. Ошибка:${xhr.status}`)
-                    }
-                }
-            
-                xhr.open('GET', url, true)
-                xhr.send()
-            })
-        },
-        filterGoods(searchLine) {
-            const regexp = new RegExp(searchLine, 'i')
-            this.filteredGoods = this.goods.filter(good => regexp.test(good.product_name))
-        }
-    },
-    mounted() {
-        this.makeGETRequest(`${API_URL}/catalogData.json`)
-        .then(
-            res => {
-                this.goods = JSON.parse(res)
-                this.filteredGoods = JSON.parse(res)
-            },
-            error => console.log(error)
-        )
-    }
-})
-
 Vue.component('goods-list', {
     props: ['goods'],
     template: `
@@ -59,7 +12,7 @@ Vue.component('goods-list', {
                 </tr>
             </thead>
             <tbody>
-                <goods-item class="goods-item" v-for="(good, index) in goods" :good="good" :index="index"></goods-item>
+                <goods-item class="goods-item" v-for="(good, index) in goods" :good="good" :key="good.id_product" :index="index"></goods-item>
                 <tr v-if="goods.length == 0"><td colspan="3">Список пуст</td></tr>
             </tbody>
         </table>
@@ -94,6 +47,83 @@ Vue.component('search', {
         filterGoods() {
             this.$emit('search', this.searchLine)
         }
+    }
+})
+
+Vue.component('basket', {
+    props: ['goods'],
+    template: `
+        <div class="modal" tabindex="-1" id="basket">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Корзина</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <goods-list :goods="goods"></goods-list>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `
+})
+
+const app = new Vue({
+    el: '#app',
+    data: {
+        goods: [],
+        filteredGoods: [],
+        basketGoods: [],
+        isVisibleCart: false
+    },
+    methods: {
+        makeGETRequest(url) {
+            return new Promise((resolve, reject) => {
+                let xhr
+            
+                if (window.XMLHttpRequest) {
+                    xhr = new XMLHttpRequest()
+                } else if (window.ActiveXObject) { 
+                    xhr = new ActiveXObject("Microsoft.XMLHTTP")
+                }
+            
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status == 200) resolve(xhr.responseText)
+                        else reject(`Запрос не прошел ${url}. Ошибка:${xhr.status}`)
+                    }
+                }
+            
+                xhr.open('GET', url, true)
+                xhr.send()
+            })
+        },
+        filterGoods(searchLine) {
+            const regexp = new RegExp(searchLine, 'i')
+            this.filteredGoods = this.goods.filter(good => regexp.test(good.product_name))
+        }
+    },
+    mounted() {
+        this.makeGETRequest(`${API_URL}/catalogData.json`)
+        .then(
+            res => {
+                this.goods = JSON.parse(res)
+                this.filteredGoods = JSON.parse(res)
+            },
+            error => console.log(error)
+        )
+
+        this.makeGETRequest(`${API_URL}/getBasket.json`)
+        .then(
+            res => {
+                this.basketGoods = JSON.parse(res).contents
+            },
+            error => console.log(error)
+        )
     }
 })
     
