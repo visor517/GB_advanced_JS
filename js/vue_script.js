@@ -5,7 +5,6 @@ const app = new Vue({
     data: {
         goods: [],
         filteredGoods: [],
-        searchLine: '',
         isVisibleCart: false
     },
     methods: {
@@ -31,8 +30,8 @@ const app = new Vue({
                 xhr.send()
             })
         },
-        filterGoods() {
-            const regexp = new RegExp(this.searchLine, 'i')
+        filterGoods(searchLine) {
+            const regexp = new RegExp(searchLine, 'i')
             this.filteredGoods = this.goods.filter(good => regexp.test(good.product_name))
         }
     },
@@ -76,5 +75,25 @@ Vue.component('goods-item', {
             <td>{{ good.price }} руб.</td>
         </tr>
     `
+})
+
+Vue.component('search', {
+    data() {
+        return {
+            searchLine: ''
+        }
+    },
+    template: `
+        <div class="d-flex align-items-center">
+            <input id="search-input" type="text" class="goods-search mx-3" v-model="searchLine" />
+            <button id="search-button" class="btn btn-outline-light cart-button"
+                type="button" v-on:click="filterGoods">Искать</button>
+        </div>
+    `,
+    methods: {
+        filterGoods() {
+            this.$emit('search', this.searchLine)
+        }
+    }
 })
     

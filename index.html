@@ -28,9 +28,7 @@
                 <div class="container-fluid">
                     <a class="nav-link active" aria-current="page" href="index.html"><h2 class="text-light">eShop</h2></a>
                     <div class="nav-wrapper">
-                        <input id="search-input" type="text" class="goods-search" v-model="searchLine" />
-                        <button id="search-button" class="btn btn-outline-light cart-button"
-                            type="button" @click="filterGoods">Искать</button>
+                        <search v-on:search="filterGoods"></search>
                         <button class="btn btn-outline-light cart-button" type="button"
                             data-bs-toggle="modal" data-bs-target="#basket">Корзина</button>
                     </div>
