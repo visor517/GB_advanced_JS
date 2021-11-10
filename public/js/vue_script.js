@@ -1,5 +1,3 @@
-const API_URL = 'http://localhost:3000/api'
-
 Vue.component('goods-list', {
     props: ['goods'],
     template: `
@@ -9,10 +7,12 @@ Vue.component('goods-list', {
                     <th scope="col">#</th>
                     <th scope="col">Название</th>
                     <th scope="col">Цена</th>
+                    <th scope="col" class="text-center">Навигация</th>
                 </tr>
             </thead>
             <tbody>
-                <goods-item class="goods-item" v-for="(good, index) in goods" :good="good" :key="good.id_product" :index="index"></goods-item>
+                <goods-item class="goods-item" v-for="(good, index) in goods"
+                :good="good" :key="good.id_product" :index="index"></goods-item>
                 <tr v-if="goods.length == 0"><td colspan="3">Список пуст</td></tr>
             </tbody>
         </table>
@@ -20,14 +20,36 @@ Vue.component('goods-list', {
 })
 
 Vue.component('goods-item', {
-    props: ['good', 'index'],
+    props: {
+        good: Object,
+        index: Number
+    },
     template: `
         <tr>
             <th scope="row">{{index+1}}</th>
             <td>{{ good.product_name }}</td>
             <td>{{ good.price }} руб.</td>
+            <td class="text-center">
+                <button type="button" class="btn btn-success btn-sm"
+                @click="addToBasket">в корзину</button>
+            </td>
         </tr>
-    `
+    `,
+    methods: {  
+        addToBasket() {
+            fetch('/api/addToBasket', {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/JSON'
+                },
+                body: JSON.stringify(this.good)
+            })
+            .then(
+                res => console.log(res.status),
+                err => console.log(`Добавление ${this.good.product_name} не прошло`)
+            )
+        }
+    }
 })
 
 Vue.component('search', {
@@ -40,7 +62,7 @@ Vue.component('search', {
         <div class="d-flex align-items-center">
             <input id="search-input" type="text" class="goods-search mx-3" v-model="searchLine" />
             <button id="search-button" class="btn btn-outline-light cart-button"
-                type="button" v-on:click="filterGoods">Искать</button>
+                type="button" @click="filterGoods">Искать</button>
         </div>
     `,
     methods: {
@@ -81,42 +103,11 @@ const app = new Vue({
         isVisibleCart: false
     },
     methods: {
-        makeGETRequest(url) {
-            return new Promise((resolve, reject) => {
-                let xhr
-            
-                if (window.XMLHttpRequest) {
-                    xhr = new XMLHttpRequest()
-                } else if (window.ActiveXObject) { 
-                    xhr = new ActiveXObject("Microsoft.XMLHTTP")
-                }
-            
-                xhr.onreadystatechange = function () {
-                    if (xhr.readyState === 4) {
-                        if (xhr.status == 200) resolve(xhr.responseText)
-                        else reject(`Запрос не прошел ${url}. Ошибка:${xhr.status}`)
-                    }
-                }
-            
-                xhr.open('GET', url, true)
-                xhr.send()
-            })
-        },
-        makePOSTRequest(url, data, callback) {
-            let xhr
-            if (window.XMLHttpRequest) {
-                xhr = new XMLHttpRequest()
-            } else if (window.ActiveXObject) {
-                xhr = new ActiveXObject("Microsoft.XMLHTTP")
-            }
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4) {
-                    callback(xhr.responseText)
-                }
-            }
-            xhr.open('POST', url, true)
-            xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8')
-            xhr.send(data)
+        getData(url) {
+            return (
+                fetch(url)
+                .then(res => res.json())
+            )
         },
         filterGoods(searchLine) {
             const regexp = new RegExp(searchLine, 'i')
@@ -124,21 +115,19 @@ const app = new Vue({
         }
     },
     mounted() {
-        this.makeGETRequest(`${API_URL}/catalog`)
+        this.getData(`/api/catalog`)
         .then(
             res => {
-                this.goods = JSON.parse(res)
-                this.filteredGoods = JSON.parse(res)
+                this.goods = res
+                this.filteredGoods = res
             },
-            error => console.log(error)
+            err => console.log('Не получен каталог')
         )
 
-        this.makeGETRequest(`${API_URL}/basket`)
+        this.getData(`/api/basket`)
         .then(
-            res => {
-                this.basketGoods = JSON.parse(res).contents
-            },
-            error => console.log(error)
+            res => this.basketGoods = res,
+            err => console.log('Не получена корзина')
         )
     }
 })
