@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "Репозиторий для домашних заданий",
   "main": "server.js",
+  "type": "module",
   "scripts": {
+    "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -16,8 +18,7 @@
   ],
   "author": "Artem visor517@yandex.ru",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/visor517/GB_advanced_JS/issues"
-  },
-  "homepage": "https://github.com/visor517/GB_advanced_JS#readme"
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }
