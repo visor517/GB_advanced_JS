@@ -13,7 +13,7 @@ Vue.component('goods-list', {
             <tbody>
                 <goods-item class="goods-item" v-for="(good, index) in goods"
                 :good="good" :key="good.id_product" :index="index"></goods-item>
-                <tr v-if="goods.length == 0"><td colspan="3">Список пуст</td></tr>
+                <tr v-if="goods.length == 0"><td colspan="4">Список пуст</td></tr>
             </tbody>
         </table>
     `
@@ -44,10 +44,7 @@ Vue.component('goods-item', {
                 },
                 body: JSON.stringify(this.good)
             })
-            .then(
-                res => console.log(res.status),
-                err => console.log(`Добавление ${this.good.product_name} не прошло`)
-            )
+            .catch(err => console.log(`Добавление ${this.good.product_name} не прошло`))
         }
     }
 })
@@ -83,7 +80,28 @@ Vue.component('basket', {
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <goods-list :goods="goods"></goods-list>
+                    <table id="goods-list" class="table table-success table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Название</th>
+                                <th scope="col">Цена</th>
+                                <th scope="col" class="text-center">Навигация</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(good, index) in goods" :good="good" :key="good.id_product" :index="index">
+                                <th scope="row">{{index+1}}</th>
+                                <td>{{ good.product_name }}</td>
+                                <td>{{ good.price }} руб.</td>
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-success btn-sm"
+                                    @click="removeItem(good.product_name)">удалить</button>
+                                </td>
+                            </tr>
+                            <tr v-if="goods.length == 0"><td colspan="4">Список пуст</td></tr>
+                        </tbody>
+                    </table>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-success" data-bs-dismiss="modal">Close</button>
@@ -91,7 +109,22 @@ Vue.component('basket', {
                 </div>
             </div>
         </div>
-    `
+    `,
+    methods: {  
+        removeItem(product_name) {
+            fetch('/api/removeFromBasket', {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/JSON'
+                },
+                body: JSON.stringify({product_name: product_name})
+            })
+            .then(
+                res => this.$emit('update'),
+                err => console.log(`Удаление ${this.good.product_name} не прошло`)
+            )
+        }
+    }
 })
 
 const app = new Vue({
@@ -100,7 +133,7 @@ const app = new Vue({
         goods: [],
         filteredGoods: [],
         basketGoods: [],
-        isVisibleCart: false
+        isVisibleBasket: false
     },
     methods: {
         getData(url) {
@@ -112,6 +145,13 @@ const app = new Vue({
         filterGoods(searchLine) {
             const regexp = new RegExp(searchLine, 'i')
             this.filteredGoods = this.goods.filter(good => regexp.test(good.product_name))
+        },
+        refreshBasket() {
+            this.getData(`/api/basket`)
+            .then(
+                res => this.basketGoods = res,
+                err => console.log('Не получена корзина')
+            )
         }
     },
     mounted() {
@@ -124,11 +164,7 @@ const app = new Vue({
             err => console.log('Не получен каталог')
         )
 
-        this.getData(`/api/basket`)
-        .then(
-            res => this.basketGoods = res,
-            err => console.log('Не получена корзина')
-        )
+        this.refreshBasket()
     }
 })
     
