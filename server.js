@@ -5,7 +5,7 @@ import fs from 'fs'
 const app = express()
 const SERVER_PORT = 3000
 
-app.use(express.static('./public/'))
+app.use(express.static('./dist/'))
 app.use(express.json())
 
 app.get('/api/catalog', (req, res) => {
@@ -53,7 +53,6 @@ app.post('/api/removeFromBasket', (req, res) => {
         })
     })
 })
-
 
 app.listen(SERVER_PORT, () => {
     console.log(`Server is running on port ${SERVER_PORT}!`)

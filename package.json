@@ -7,10 +7,14 @@
   "scripts": {
     "serve": "nodemon server.js",
     "start": "node server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "webpack",
+    "watch": "webpack -w"
   },
   "nodemonConfig": {
-    "ignore": ["db/*", "public/*"]
+    "ignore": [
+      "db/*",
+      "src/*"
+    ]
   },
   "repository": {
     "type": "git",
@@ -23,7 +27,10 @@
   "author": "Artem visor517@yandex.ru",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "vue": "^2.6.14",
+    "vue-loader": "^15.9.8",
+    "vue-template-compiler": "^2.6.14"
   },
   "devDependencies": {
     "nodemon": "^2.0.15"

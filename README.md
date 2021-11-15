@@ -14,3 +14,4 @@ API в виде json файлов в папке db
 5. VUE
 6. Компоненты VUE
 7. node, express
+8. webpack, тестирование
