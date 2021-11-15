@@ -27,7 +27,6 @@ export default {
     components: {
         GoodItem
     },
-    name: GoodsList,
     props: ['goods']
 }
 </script>

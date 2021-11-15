@@ -1,11 +1,11 @@
-import express from 'express'
-import fs from 'fs'
+express = require('express')
+fs = require('fs')
 
 
 const app = express()
 const SERVER_PORT = 3000
 
-app.use(express.static('./dist/'))
+//app.use(express.static('./dist/'))
 app.use(express.json())
 
 app.get('/api/catalog', (req, res) => {

@@ -5,9 +5,9 @@
             <nav class="navbar navbar-light">
                 <div class="container-fluid">
                     <a class="nav-link active" aria-current="page" href="index.html"><h2 class="text-light">eShop</h2></a>
-                    <div class="nav-wrapper">
-                        <search v-on:search="filterGoods"></search>
-                        <button class="btn btn-outline-light cart-button" type="button"
+                    <div class="d-flex">
+                        <Search v-on:search="filterGoods"></Search>
+                        <button class="btn btn-outline-light cart-button ms-3" type="button"
                             data-bs-toggle="modal" data-bs-target="#basket"
                             @click="refreshBasket">Корзина</button>
                     </div>
