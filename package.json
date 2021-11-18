@@ -1,0 +1,31 @@
+{
+  "name": "vue_shop",
+  "version": "1.0.0",
+  "description": "Репозиторий для домашних заданий",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "serve": "nodemon server.js",
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "nodemonConfig": {
+    "ignore": ["db/*", "public/*"]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/visor517/GB_advanced_JS.git"
+  },
+  "keywords": [
+    "vue",
+    "express"
+  ],
+  "author": "Artem visor517@yandex.ru",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}

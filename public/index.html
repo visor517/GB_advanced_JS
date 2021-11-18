@@ -7,7 +7,7 @@
 </head>
 <body>
     <div id="app">
-        <basket :goods="basketGoods"></basket>
+        <basket :goods="basketGoods" v-on:update="refreshBasket"></basket>
         <header class="container-xxl bg-success">
             <nav class="navbar navbar-light">
                 <div class="container-fluid">
@@ -15,7 +15,8 @@
                     <div class="nav-wrapper">
                         <search v-on:search="filterGoods"></search>
                         <button class="btn btn-outline-light cart-button" type="button"
-                            data-bs-toggle="modal" data-bs-target="#basket">Корзина</button>
+                            data-bs-toggle="modal" data-bs-target="#basket"
+                            @click="refreshBasket">Корзина</button>
                     </div>
                 </div>
             </nav>
