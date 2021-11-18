@@ -2,15 +2,17 @@
   "name": "vue_shop",
   "version": "1.0.0",
   "description": "Репозиторий для домашних заданий",
-  "main": "server.js",
-  "type": "module",
+  "main": "/src/main.js",
   "scripts": {
     "serve": "nodemon server.js",
-    "start": "node server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "vue-cli-service serve",
+    "build": "vue-cli-service build"
   },
   "nodemonConfig": {
-    "ignore": ["db/*", "public/*"]
+    "ignore": [
+      "db/*",
+      "src/*"
+    ]
   },
   "repository": {
     "type": "git",
@@ -23,9 +25,17 @@
   "author": "Artem visor517@yandex.ru",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.1"
+    "bootstrap": "^5.1.3",
+    "core-js": "^3.6.5",
+    "jquery": "^3.6.0",
+    "popper.js": "^1.16.1",
+    "vue": "^2.6.11"
   },
   "devDependencies": {
-    "nodemon": "^2.0.15"
+    "express": "^4.17.1",
+    "nodemon": "^2.0.15",
+    "@vue/cli-plugin-babel": "~4.5.0",
+    "@vue/cli-service": "~4.5.0",
+    "vue-template-compiler": "^2.6.11"
   }
 }

@@ -1,61 +1,17 @@
 <!DOCTYPE html>
-<html>
-<head>
-    <title>eShop</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/bootstrap.min.css">
-</head>
-<body>
-    <div id="app">
-        <basket :goods="basketGoods" v-on:update="refreshBasket"></basket>
-        <header class="container-xxl bg-success">
-            <nav class="navbar navbar-light">
-                <div class="container-fluid">
-                    <a class="nav-link active" aria-current="page" href="index.html"><h2 class="text-light">eShop</h2></a>
-                    <div class="nav-wrapper">
-                        <search v-on:search="filterGoods"></search>
-                        <button class="btn btn-outline-light cart-button" type="button"
-                            data-bs-toggle="modal" data-bs-target="#basket"
-                            @click="refreshBasket">Корзина</button>
-                    </div>
-                </div>
-            </nav>
-        </header>
-        <main class="container-xxl bg-light p-3">
-            <div class="row">
-                <div class="col">
-                    <goods-list :goods="filteredGoods"></goods-list>
-                </div>
-            </div>
-            <div class="row mt-3 p-3">
-                <!-- форма временно отключена -->
-                <div class="col-4 border p-3 d-none">
-                    <h3>Форма обратной связи</h3>
-                    <form>
-                        <div class="mb-3">
-                            <label for="formName" class="form-label">Имя:</label>
-                            <input type="text" class="form-control" id="formName" placeholder="только буквы">
-                        </div>
-                        <div class="mb-3">
-                            <label for="formPhone" class="form-label">Телефон:</label>
-                            <input type="text" class="form-control" id="formPhone" placeholder="+7(000)000-0000">
-                        </div>
-                        <div class="mb-3">
-                            <label for="formEmail" class="form-label">E-mail:</label>
-                            <input type="email" class="form-control" id="formEmail">
-                        </div>
-                        <div class="mb-3">
-                            <label for="formComment" class="form-label">Комментарий:</label>
-                            <textarea class="form-control" placeholder="Оставьте комментарий" id="formComment"></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary" id="form-button">Проверить</button>
-                    </form>
-                </div>
-            </div>
-        </main>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-    <script src="js/vue_script.js"></script>
-</body>
+<html lang="">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+    <title><%= htmlWebpackPlugin.options.title %></title>
+  </head>
+  <body>
+    <noscript>
+      <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+    </noscript>
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
+  </body>
 </html>
